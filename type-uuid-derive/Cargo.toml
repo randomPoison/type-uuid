@@ -6,6 +6,7 @@ edition = "2018"
 description = "Custom derive for the type-uuid crate"
 documentation = "https://docs.rs/type-uuid"
 repository = "https://github.com/randomPoison/type-uuid"
+license = "Apache-2.0 OR MIT"
 
 [lib]
 proc-macro = true
