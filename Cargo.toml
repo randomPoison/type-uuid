@@ -7,7 +7,6 @@ edition = "2018"
 [dependencies]
 type-uuid-derive = { path = "./type-uuid-derive" }
 amethyst = { version = "0.10.0", optional = true }
-serde = "1.0"
 
 [dev-dependencies]
 uuid = "0.7.1"

@@ -1,3 +1,30 @@
+//! This crate provides a way to specify a stable, unique identifier for Rust types.
+//!
+//! # Assigning UUIDs to Types
+//!
+//! This crate provides the [`TypeUuid`] trait, which defines a single const item
+//! `UUID`. This value is a byte array containing the raw bytes of the UUID for the
+//! type.
+//!
+//! You will have to manually specify the UUID for any type implementing
+//! [`TypeUuid`], but this crate provides a custom derive to make that easy to do:
+//!
+//! ```
+//! use type_uuid::TypeUuid;
+//!
+//! #[derive(TypeUuid)]
+//! #[uuid = "d4adfc76-f5f4-40b0-8e28-8a51a12f5e46"]
+//! struct MyType;
+//! ```
+//!
+//! While the derive handles the tedious work of converting the UUID into a byte
+//! array suitable for use with the [`TypeUuid`] trait, you'll still need to
+//! generate a valid UUID in order to assign it to your type. To do so, we
+//! recommend using https://www.uuidgenerator.net, which provides a quick way
+//! generate new UUIDs that you can paste into your code.
+//!
+//! [`TypeUuid`]: ./trait.TypeUuid.html
+
 #[doc(hidden)]
 pub use type_uuid_derive::*;
 
@@ -10,6 +37,8 @@ pub mod amethyst_types;
 /// Logically it's meant to be equivalent to using a `u128` to represent the
 /// UUID's numeric value, but specifying it as a byte array allows us to avoid
 /// endianness issues.
+///
+/// [bytes]: https://docs.rs/uuid/0.7/uuid/type.Bytes.html
 pub type Bytes = [u8; 16];
 
 /// Provides a statically defined UUID for a Rust type.
@@ -32,11 +61,13 @@ pub trait TypeUuid {
     const UUID: Bytes;
 }
 
-/// Allows the TypeUuid constants to be retrieved via a trait object.  It is automatically implemented
-/// for all types that implement TypeUuid.
+/// Allows the TypeUuid constants to be retrieved via a trait object.
 ///
-/// It is theoretically possible to manually implement this independent of `TypeUuid`.  Please don't.
-/// It is critical that this return value be deterministic, and manual implementation could prevent that.
+/// This trait is automatically implemented for all types that implement [`TypeUuid`].
+/// Do not manually implement this trait for any type. Instead, implement the
+/// [`TypeUuid`] trait.
+///
+/// [`TypeUuid`]: ./trait.TypeUuid.html
 pub trait TypeUuidDynamic {
     fn uuid(&self) -> Bytes;
 }
