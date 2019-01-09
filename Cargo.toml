@@ -1,10 +1,11 @@
 [package]
 name = "type-uuid"
 version = "0.1.0"
-authors = ["Jacob Kiesel <kieseljake@gmail.com>", "David LeGare <dlegare.1001@gmail.com>"]
+authors = ["David LeGare <dlegare.1001@gmail.com>", "Jacob Kiesel <kieseljake@gmail.com>"]
 edition = "2018"
 
 description = "Safe, stable IDs for Rust types"
+readme = "./README.md"
 documentation = "https://docs.rs/type-uuid"
 repository = "https://github.com/randomPoison/type-uuid"
 license = "Apache-2.0 OR MIT"
