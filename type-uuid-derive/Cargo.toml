@@ -3,6 +3,9 @@ name = "type-uuid-derive"
 version = "0.1.0"
 authors = ["David LeGare <dlegare.1001@gmail.com>"]
 edition = "2018"
+description = "Custom derive for the type-uuid crate"
+documentation = "https://docs.rs/type-uuid"
+repository = "https://github.com/randomPoison/type-uuid"
 
 [lib]
 proc-macro = true
