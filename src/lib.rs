@@ -25,6 +25,10 @@
 //!
 //! [`TypeUuid`]: ./trait.TypeUuid.html
 
+pub fn i_have_added_a_new_function() {
+    println!("cool");
+}
+
 #[doc(hidden)]
 pub use type_uuid_derive::*;
 
