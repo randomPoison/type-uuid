@@ -25,8 +25,8 @@
 //!
 //! [`TypeUuid`]: ./trait.TypeUuid.html
 
-pub fn i_have_added_a_new_function() {
-    println!("What a great function");
+pub fn i_renamed_the_function() {
+    println!("Now it has a new name");
 }
 
 #[doc(hidden)]
