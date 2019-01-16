@@ -42,7 +42,7 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
         .as_bytes()
         .iter()
         .map(|byte| format!("{:#X}", byte))
-        .map(|byte_str| syn::parse_str::<proc_macro2::Literal>(&byte_str).unwrap());
+        .map(|byte_str| syn::parse_str::<LitInt>(&byte_str).unwrap());
 
     let gen = quote! {
         impl type_uuid::TypeUuid for #name {
