@@ -2,30 +2,7 @@ use crate::*;
 
 pub type ObjGraphics = amethyst::renderer::GraphicsPrefab<Vec<amethyst::renderer::PosNormTex>>;
 
-impl TypeUuid for amethyst::core::Transform {
-    const UUID: Bytes = [
-        0xF3, 0xD4, 0x9C, 0xC2, 0xC7, 0x7E, 0x4D, 0xC9, 0x9E, 0x1F, 0xC0, 0x1E, 0x92, 0x79, 0xC9,
-        0x99,
-    ];
-}
-
-impl TypeUuid for amethyst::renderer::CameraPrefab {
-    const UUID: Bytes = [
-        0x15, 0xED, 0x1B, 0x66, 0x53, 0x7E, 0x4E, 0x75, 0xB5, 0x2D, 0xCD, 0x46, 0x59, 0xBA, 0x53,
-        0xBF,
-    ];
-}
-
-impl TypeUuid for amethyst::renderer::LightPrefab {
-    const UUID: Bytes = [
-        0x41, 0xC4, 0x4, 0x89, 0x26, 0x9B, 0x4E, 0xF5, 0xAF, 0x7F, 0x67, 0x5A, 0x29, 0x47, 0x3F,
-        0x86,
-    ];
-}
-
-impl TypeUuid for ObjGraphics {
-    const UUID: Bytes = [
-        0x2F, 0x2D, 0x6C, 0x63, 0x44, 0xFF, 0x4E, 0x8A, 0xBA, 0xBF, 0x4E, 0x5D, 0xF4, 0x75, 0x19,
-        0xD6,
-    ];
-}
+external_type_uuid!(amethyst::core::Transform, "f3d49cc2-c77e-4dc9-9e1f-c01e9279c999");
+external_type_uuid!(amethyst::renderer::CameraPrefab, "15ed1b66-537e-4e75-b52d-cd4659ba53bf");
+external_type_uuid!(amethyst::renderer::LightPrefab, "41c40489-269b-4ef5-af7f-675a29473f86");
+external_type_uuid!(ObjGraphics, "2f2d6c63-44ff-4e8a-babf-4e5df47519d6");
