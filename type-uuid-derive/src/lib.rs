@@ -1,21 +1,16 @@
 extern crate proc_macro;
 
-use proc_macro::*;
 use quote::quote;
 use syn::*;
 use uuid::Uuid;
 
 #[proc_macro_derive(TypeUuid, attributes(uuid))]
-pub fn hello_macro_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     // Construct a representation of Rust code as a syntax tree
     // that we can manipulate
-    let ast = syn::parse(input).unwrap();
+    let ast: DeriveInput = syn::parse(input).unwrap();
 
     // Build the trait implementation
-    impl_hello_macro(&ast)
-}
-
-fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
     let mut uuid = None;

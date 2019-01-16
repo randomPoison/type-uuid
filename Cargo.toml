@@ -19,3 +19,6 @@ amethyst = { version = "0.10.0", optional = true }
 uuid = "0.7.1"
 
 [workspace]
+members = [
+    "./type-uuid-derive",
+]
