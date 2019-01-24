@@ -63,12 +63,12 @@ pub trait TypeUuid {
 
 /// Allows the TypeUuid constants to be retrieved via a trait object.
 ///
-/// This trait is automatically implemented for all types that implement [`TypeUuid`].
-/// Do not manually implement this trait for any type. Instead, implement the
-/// [`TypeUuid`] trait.
+/// This trait is sealed and cannot be implemented outside of the type-uuid
+/// codebase. It is implemented automatically for all types that implement
+/// [`TypeUuid`], which you should implement instead.
 ///
 /// [`TypeUuid`]: ./trait.TypeUuid.html
-pub trait TypeUuidDynamic {
+pub trait TypeUuidDynamic: private::Sealed {
     fn uuid(&self) -> Bytes;
 }
 
@@ -76,6 +76,12 @@ impl<T: TypeUuid> TypeUuidDynamic for T {
     fn uuid(&self) -> Bytes {
         Self::UUID
     }
+}
+
+mod private {
+    pub trait Sealed {}
+
+    impl<T: super::TypeUuid> Sealed for T {}
 }
 
 // Implement `TypeUuid` for primitive types and types defined in the standard library.
