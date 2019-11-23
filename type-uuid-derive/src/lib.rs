@@ -22,7 +22,12 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
             continue;
         };
 
-        if name_value.ident != "uuid" {
+        if name_value
+            .path
+            .get_ident()
+            .map(|i| i != "uuid")
+            .unwrap_or(true)
+        {
             continue;
         }
 
