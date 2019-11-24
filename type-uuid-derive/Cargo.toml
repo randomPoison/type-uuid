@@ -13,6 +13,6 @@ license = "Apache-2.0 OR MIT"
 proc-macro = true
 
 [dependencies]
-syn = "0.15.23"
-quote = "0.6.10"
-uuid = "0.7.1"
+syn = "1.0"
+quote = "1.0"
+uuid = { version = "0.8", default-features = false }
