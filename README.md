@@ -22,7 +22,7 @@ struct MyType;
 While the derive handles the tedious work of converting the UUID into a byte
 array suitable for use with the [`TypeUuid`] trait, you'll still need to
 generate a valid UUID in order to assign it to your type. To do so, we
-recommend using https://www.uuidgenerator.net, which provides a quick way
+recommend using https://www.uuidtools.com, which provides a quick way
 generate new UUIDs that you can paste into your code.
 
 [`TypeUuid`]: ./trait.TypeUuid.html
