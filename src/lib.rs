@@ -23,6 +23,10 @@
 //! recommend using https://www.uuidgenerator.net, which provides a quick way
 //! generate new UUIDs that you can paste into your code.
 //!
+//! The `autogen` feature can be enabled for automatically generating V5 UUID's based on a
+//! type-uuid namespace (static) and the name of the type being provided. Note, this will cause
+//! UUID conflicts for types with the same name.
+//!
 //! [`TypeUuid`]: ./trait.TypeUuid.html
 
 #[doc(hidden)]

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+* Add `autogen` feature for auto generated name-based UUIDs
+
+[#8]: https://github.com/randomPoison/type-uuid/pull/8
+
 ## [0.1.2] - 2019-12-01
 
 * Sealed the `TypeUuidDynamic` trait so that it can't be implemented downstream. ([#5])

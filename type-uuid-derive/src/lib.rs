@@ -5,7 +5,14 @@ use syn::parse::*;
 use syn::*;
 use uuid::Uuid;
 
-#[proc_macro_derive(TypeUuid, attributes(uuid))]
+/// UUID namespace for type-uuid
+#[cfg(feature = "autogen")]
+const UUID_NAMESPACE: Uuid = Uuid::from_bytes([
+    0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0,
+    0x4f, 0xd4, 0x30, 0xc8,
+]);
+
+#[proc_macro_derive(TypeUuid, attributes(uuid, auto_uuid))]
 pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     // Construct a representation of Rust code as a syntax tree
     // that we can manipulate
@@ -31,9 +38,11 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
             continue;
         }
 
+
+
         let uuid_str = match name_value.lit {
             Lit::Str(lit_str) => lit_str,
-            _ => panic!("uuid attribute must take the form `#[uuid = \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"`"),
+            _ => panic!("uuid attribute must take the form `#[uuid = \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"]`"),
         };
 
         uuid = Some(
@@ -42,8 +51,16 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
         );
     }
 
+    #[cfg(feature = "autogen")]
     let uuid =
+        uuid.unwrap_or(uuid::Uuid::new_v5(
+            &UUID_NAMESPACE,
+            name.to_string().as_bytes(),
+        ));
+    #[cfg(not(feature = "autogen"))]
+        let uuid =
         uuid.expect("No `#[uuid = \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"` attribute found");
+
     let bytes = uuid
         .as_bytes()
         .iter()
