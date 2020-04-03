@@ -53,7 +53,7 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
 
     #[cfg(feature = "autogen")]
     let uuid =
-        uuid.unwrap_or(uuid::Uuid::new_v5(
+        uuid.unwrap_or_else(|| uuid::Uuid::new_v5(
             &UUID_NAMESPACE,
             name.to_string().as_bytes(),
         ));
