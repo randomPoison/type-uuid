@@ -142,7 +142,7 @@ mod test {
     /// Verifies that `TypeUuidDynamic` can be instantiated as a trait object.
     #[test]
     fn type_uuid_trait_object() {
-        let trait_object = Box::new(()) as Box<TypeUuidDynamic>;
+        let trait_object = Box::new(()) as Box<dyn TypeUuidDynamic>;
         println!("UUID for (): {:#X?}", trait_object.uuid());
     }
 }
