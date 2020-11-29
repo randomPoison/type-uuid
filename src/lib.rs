@@ -26,6 +26,8 @@
 //! [`TypeUuid`]: ./trait.TypeUuid.html
 
 #[doc(hidden)]
+pub use const_sha1;
+#[doc(hidden)]
 pub use type_uuid_derive::*;
 
 #[cfg(feature = "amethyst")]
@@ -134,6 +136,22 @@ external_type_uuid!(std::path::PathBuf, "d6db3123-4c95-45de-a28f-5a48d574b9c4");
 #[allow(dead_code)]
 type Unit = ();
 external_type_uuid!(Unit, "03748d1a-0d0c-472f-9fdd-424856157064");
+
+// Base UUID for `Vec`: cbbd2c4b-7779-4ed4-a9b8-e0223046bdc1
+impl<T: TypeUuid> TypeUuid for Vec<T> {
+    const UUID: Bytes = {
+        let buffer = const_sha1::ConstBuffer::from_slice(
+            stringify!("cbbd2c4b-7779-4ed4-a9b8-e0223046bdc1").as_bytes(),
+        )
+        .push_slice(&T::UUID);
+        let digest = const_sha1::sha1(&buffer).bytes();
+        [
+            digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
+            digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14],
+            digest[15],
+        ]
+    };
+}
 
 #[cfg(test)]
 mod test {

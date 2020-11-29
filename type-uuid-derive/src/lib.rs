@@ -50,11 +50,39 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
         .map(|byte| format!("{:#X}", byte))
         .map(|byte_str| syn::parse_str::<LitInt>(&byte_str).unwrap());
 
-    let gen = quote! {
-        impl type_uuid::TypeUuid for #name {
-            const UUID: type_uuid::Bytes = [
-                #( #bytes ),*
-            ];
+    let gen = if ast.generics.params.is_empty() {
+        quote! {
+            impl type_uuid::TypeUuid for #name {
+                const UUID: type_uuid::Bytes = [
+                    #( #bytes ),*
+                ];
+            }
+        }
+    } else {
+        let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
+        let generic_idents = ast.generics.type_params().map(|param| &param.ident);
+        quote! {
+            impl #impl_generics type_uuid::TypeUuid for #name #ty_generics #where_clause {
+                const UUID: type_uuid::Bytes = {
+                    // Generate the initial buffer based on the base UUID for the type.
+                    let buffer = type_uuid::const_sha1::ConstBuffer::from_slice(&[
+                        #( #bytes ),*
+                    ]);
+
+                    // Append the UUID for each type parameter in order.
+                    #(
+                        let buffer = buffer.push_slice(&<#generic_idents as type_uuid::TypeUuid>::UUID);
+                    )*
+
+                    // Generate the digest and spit out the first 16 bytes as the UUID.
+                    let digest = type_uuid::const_sha1::sha1(&buffer).bytes();
+                    [
+                        digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
+                        digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14],
+                        digest[15],
+                    ]
+                };
+            }
         }
     };
     gen.into()
