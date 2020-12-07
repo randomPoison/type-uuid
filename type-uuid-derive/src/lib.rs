@@ -1,6 +1,4 @@
-extern crate proc_macro;
-
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::parse::*;
 use syn::*;
 use uuid::Uuid;
@@ -61,27 +59,10 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     } else {
         let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
         let generic_idents = ast.generics.type_params().map(|param| &param.ident);
+        let body = impl_generic(bytes, generic_idents);
         quote! {
             impl #impl_generics type_uuid::TypeUuid for #name #ty_generics #where_clause {
-                const UUID: type_uuid::Bytes = {
-                    // Generate the initial buffer based on the base UUID for the type.
-                    let buffer = type_uuid::const_sha1::ConstBuffer::from_slice(&[
-                        #( #bytes ),*
-                    ]);
-
-                    // Append the UUID for each type parameter in order.
-                    #(
-                        let buffer = buffer.push_slice(&<#generic_idents as type_uuid::TypeUuid>::UUID);
-                    )*
-
-                    // Generate the digest and spit out the first 16 bytes as the UUID.
-                    let digest = type_uuid::const_sha1::sha1(&buffer).bytes();
-                    [
-                        digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
-                        digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14],
-                        digest[15],
-                    ]
-                };
+                #body
             }
         }
     };
@@ -89,7 +70,7 @@ pub fn type_uuid_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
 }
 
 struct ExternalDeriveInput {
-    path: ExprPath,
+    path: Path,
     uuid_str: LitStr,
 }
 
@@ -114,12 +95,55 @@ pub fn external_type_uuid(tokens: proc_macro::TokenStream) -> proc_macro::TokenS
         .map(|byte| format!("{:#X}", byte))
         .map(|byte_str| syn::parse_str::<LitInt>(&byte_str).unwrap());
 
-    let gen = quote! {
-        impl crate::TypeUuid for #path {
-            const UUID: crate::Bytes = [
-                #( #bytes ),*
-            ];
+    let ty_segment = path.segments.last().expect("Invalid type path");
+    let gen = match &ty_segment.arguments {
+        PathArguments::None => quote! {
+            impl crate::TypeUuid for #path {
+                const UUID: crate::Bytes = [
+                    #( #bytes ),*
+                ];
+            }
+        },
+
+        PathArguments::AngleBracketed(args) => {
+            let body = impl_generic(bytes, args.args.iter());
+            let args = args.args.iter().map(|arg| quote! { #arg: crate::TypeUuid });
+            quote! {
+                impl< #( #args, )* > crate::TypeUuid for #path {
+                    #body
+                }
+            }
         }
+
+        PathArguments::Parenthesized(_) => panic!("Parenthesized args are unsupported"),
     };
+
     gen.into()
+}
+
+fn impl_generic<I: ToTokens>(
+    bytes: impl Iterator<Item = LitInt>,
+    generic_idents: impl Iterator<Item = I>,
+) -> proc_macro2::TokenStream {
+    quote! {
+        const UUID: type_uuid::Bytes = {
+            // Generate the initial buffer based on the base UUID for the type.
+            let buffer = type_uuid::const_sha1::ConstBuffer::from_slice(&[
+                #( #bytes ),*
+            ]);
+
+            // Append the UUID for each type parameter in order.
+            #(
+                let buffer = buffer.push_slice(&<#generic_idents as type_uuid::TypeUuid>::UUID);
+            )*
+
+            // Generate the digest and spit out the first 16 bytes as the UUID.
+            let digest = type_uuid::const_sha1::sha1(&buffer).bytes();
+            [
+                digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
+                digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14],
+                digest[15],
+            ]
+        };
+    }
 }

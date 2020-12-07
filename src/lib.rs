@@ -33,6 +33,10 @@ pub use type_uuid_derive::*;
 #[cfg(feature = "amethyst")]
 pub mod amethyst_types;
 
+// HACK: Ensure that `type_uuid` is a valid root-level symbol so that the generated
+//       code can always refer to it via an absolute path.
+use crate as type_uuid;
+
 /// A 128-bit (16 byte) buffer containing the ID.
 ///
 /// This is meant to match the [`Bytes` type defined in the uuid crate][bytes].
@@ -49,7 +53,7 @@ pub type Bytes = [u8; 16];
 ///
 /// This crate provides a custom derive that allows you to specify a UUID as
 /// a human-readable string. This is the recommended way to implement `TypeUuid`
-/// for your types. You can use https://www.uuidgenerator.net to generate
+/// for your types. You can use https://www.uuidtools.com/generate/v4 to generate
 /// random UUIDs to use with the derive.
 ///
 /// ```
@@ -137,21 +141,33 @@ external_type_uuid!(std::path::PathBuf, "d6db3123-4c95-45de-a28f-5a48d574b9c4");
 type Unit = ();
 external_type_uuid!(Unit, "03748d1a-0d0c-472f-9fdd-424856157064");
 
-// Base UUID for `Vec`: cbbd2c4b-7779-4ed4-a9b8-e0223046bdc1
-impl<T: TypeUuid> TypeUuid for Vec<T> {
-    const UUID: Bytes = {
-        let buffer = const_sha1::ConstBuffer::from_slice(
-            stringify!("cbbd2c4b-7779-4ed4-a9b8-e0223046bdc1").as_bytes(),
-        )
-        .push_slice(&T::UUID);
-        let digest = const_sha1::sha1(&buffer).bytes();
-        [
-            digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
-            digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14],
-            digest[15],
-        ]
-    };
-}
+external_type_uuid!(std::vec::Vec<T>, "cbbd2c4b-7779-4ed4-a9b8-e0223046bdc1");
+external_type_uuid!(std::boxed::Box<T>, "a38a5978-7616-4d6f-a640-00b2b52d1322");
+external_type_uuid!(std::collections::BTreeMap<K, V>, "d06cb614-df66-48ca-84dd-4c45e6ab68c7");
+external_type_uuid!(
+    std::collections::BTreeSet<T>,
+    "aead0b2b-e421-49cd-a6a0-76fd68a6af8d"
+);
+external_type_uuid!(
+    std::collections::BinaryHeap<T>,
+    "18c6a1ed-46c7-4990-9f27-a556cc95ff70"
+);
+// external_type_uuid!(
+//     std::collections::HashMap<K, V, _>,
+//     "5004bdda-52eb-4791-bb0e-c3249ed85ac6"
+// );
+// external_type_uuid!(
+//     std::collections::HashSet<T, _>,
+//     "7efd895c-46f2-4ba6-84ac-a68b3d17d1e7"
+// );
+external_type_uuid!(
+    std::collections::LinkedList<T>,
+    "9984ae88-6506-4427-92b2-ac3695c64c8d"
+);
+external_type_uuid!(
+    std::collections::VecDeque<T>,
+    "cd163faa-8732-4f5e-8411-8521ab565de0"
+);
 
 #[cfg(test)]
 mod test {
@@ -161,6 +177,13 @@ mod test {
     #[test]
     fn type_uuid_trait_object() {
         let trait_object = Box::new(()) as Box<dyn TypeUuidDynamic>;
-        println!("UUID for (): {:#X?}", trait_object.uuid());
+        assert_eq!(<() as TypeUuid>::UUID, trait_object.uuid());
+    }
+
+    #[test]
+    fn generic_type_has_id_based_on_params() {
+        let u32_id = Vec::<u32>::UUID;
+        let string_id = Vec::<String>::UUID;
+        assert_ne!(u32_id, string_id);
     }
 }
